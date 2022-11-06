@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Stage_Twos.Models;
+using Flurl.Http;
 
 namespace Stage_Twos.Controllers
 {
@@ -7,9 +8,10 @@ namespace Stage_Twos.Controllers
     [Route("[controller]")]
     public class OperationsController: ControllerBase
     {
+        private static readonly HttpClient client = new HttpClient();
 
         [HttpPost(Name = "postOperation")]
-        public ActionResult<OutputData> operation(string operation_type)
+        public async Task<string> operation(string operation_type)
         {
             int x = 20;
             int y = 30;
@@ -20,32 +22,51 @@ namespace Stage_Twos.Controllers
 
             if(operation_type == addition)
             {
-                return new OutputData()
+
+               var output =  new OutputData()
                 {
                     result = x + y,
                     operations = addition
                     
                 };
+                var content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string, string>>)output);
+
+                var response = await client.PostAsync("https://localhost:7076/Operation?operation_type=addition", content);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+               return responseString;
             }
             else if (operation_type == subtraction)
             {
-                return new OutputData()
+                var output = new OutputData()
                 {
                     result = x - y,
                     operations = subtraction
 
                 };
+                var content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string, string>>)output);
+
+                var response = await client.PostAsync("https://localhost:7076/Operation?operation_type=subtraction", content);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                return responseString;
             }
             else if (operation_type == multiplication)
             {
-                return new OutputData()
+                var output = new OutputData()
                 {
                     result = x * y,
                     operations = multiplication
 
                 };
+                var content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string, string>>)output);
+
+                var response = await client.PostAsync("https://localhost:7076/Operation?operation_type=multiplication", content);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                return responseString;
             }
-            return new OutputData();
+            return new OutputData().ToString();
         }
         
     }
